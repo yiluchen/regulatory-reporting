@@ -73,11 +73,19 @@ PYTHONPATH=agent_harness python3 -m harness.demo
 接口服务需要安装 `requirements.txt` 中的「接口与服务」可选依赖：
 
 ```bash
-uvicorn ra.api:app --app-dir report_agent                          # FastAPI + SSE
-PYTHONPATH=report_agent python3 -m ra.mcp_server                    # MCP 工具服务
+# FastAPI + SSE 流式接口（未注入检索器时自动用离线默认装配启动）
+uvicorn ra.api:app --app-dir report_agent --port 8000
+curl -s localhost:8000/health
+curl -N -X POST localhost:8000/chat/stream -H "Content-Type: application/json" \
+  -d '{"question":"逾期账龄怎么统计"}'
+
+# MCP 工具服务（需要同时暴露 report_agent 与 domain_llm 两个包）
+PYTHONPATH=report_agent:domain_llm python3 -m ra.mcp_server
 
 docker compose up -d      # 接真实服务时：PostgreSQL(pgvector) / Redis / Neo4j
 ```
+
+装了可选依赖后，接口、LangGraph 装配、MCP 三个冒烟测试会自动纳入 `pytest`；没装则自动跳过。LangGraph 版本调用时需带 `config={"configurable":{"thread_id":"..."}}`。
 
 ## 设计取舍
 

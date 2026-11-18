@@ -28,6 +28,15 @@ def configure(dual: DualRetriever) -> None:
     _state["nodes"] = ReportNodes(dual, cache=SemanticCache(), memory=LayeredMemory())
 
 
+def _ensure_ready() -> ReportNodes:
+    """未显式注入检索器时，用离线默认装配启动，保证服务开箱可跑。"""
+    if "nodes" not in _state:
+        from .demo import build_dual
+
+        configure(build_dual())
+    return _state["nodes"]
+
+
 @app.get("/health")
 def health() -> dict:
     return {"ok": True, "ready": "nodes" in _state}
@@ -35,7 +44,7 @@ def health() -> dict:
 
 @app.post("/chat/stream")
 async def chat_stream(payload: Ask) -> StreamingResponse:
-    nodes: ReportNodes = _state["nodes"]
+    nodes = _ensure_ready()
     state = {"question": payload.question, "user_id": payload.user_id, "trace": []}
     state.update(nodes.route(state))
 
