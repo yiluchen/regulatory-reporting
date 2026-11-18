@@ -1,0 +1,20 @@
+### 生产 SFT：Qwen3-14B + LoRA（行内 GPU）
+stage: sft
+do_train: true
+model_name_or_path: Qwen/Qwen3-14B
+dataset_dir: data
+dataset: regulatory_sft
+template: qwen3
+finetuning_type: lora
+lora_rank: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target: all
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 8
+learning_rate: 5.0e-5
+num_train_epochs: 3.0
+cutoff_len: 2048
+bf16: true
+save_steps: 200
+output_dir: outputs/sft-14b

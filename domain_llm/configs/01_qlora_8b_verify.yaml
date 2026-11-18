@@ -1,0 +1,18 @@
+### 本地验证：Qwen3-8B + 4bit QLoRA（单卡 4090 24G）
+stage: sft
+do_train: true
+model_name_or_path: Qwen/Qwen3-8B
+dataset_dir: data
+dataset: regulatory_sft
+template: qwen3
+finetuning_type: lora
+quantization_bit: 4
+lora_rank: 16
+lora_target: all
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+cutoff_len: 2048
+bf16: true
+output_dir: outputs/qlora-8b-verify

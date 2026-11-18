@@ -1,0 +1,29 @@
+# 工具台账：新增工具在这里登记能力与风险，业务代码零改动
+tools:
+  - name: query_report_data
+    readonly: true
+    risk: low
+    permission: report.read
+    required: [report, org, stat_date]
+    description: 只读查询报送数据
+
+  - name: search_regulation
+    readonly: true
+    risk: low
+    permission: kb.read
+    required: [question]
+    description: 检索监管发文条款
+
+  - name: submit_report
+    readonly: false
+    risk: high
+    permission: report.submit
+    required: [report, stat_date]
+    description: 提交报送数据（写）
+
+  - name: delete_batch
+    readonly: false
+    risk: high
+    permission: report.admin
+    required: [batch]
+    description: 删除批次数据（危险）

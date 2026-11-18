@@ -1,0 +1,49 @@
+tables:
+  - name: loan_contract
+    source: core.ln_contract
+    target: ods.loan_contract
+    business_key: [contract_no]
+    watermark: updated_at
+    columns:
+      - {name: contract_no, type: str, nullable: false}
+      - {name: customer_no, type: str, nullable: false}
+      - {name: org_code, type: str, nullable: false, enum: [SH01, SH02, SZ01]}
+      - {name: product_type, type: str, nullable: false, enum: ["001", "002", "003"]}
+      - {name: loan_amount, type: float, nullable: false, min: 0}
+      - {name: loan_balance, type: float, nullable: false, min: 0}
+      - {name: overdue_days, type: int, nullable: false, min: 0, max: 3650}
+      - {name: risk_class, type: str, nullable: false, enum: [正常, 关注, 次级, 可疑, 损失]}
+      - {name: updated_at, type: str, nullable: false}
+
+  - name: repayment
+    source: core.ln_repayment
+    target: ods.repayment
+    business_key: [contract_no, period_no]
+    watermark: updated_at
+    columns:
+      - {name: contract_no, type: str, nullable: false}
+      - {name: period_no, type: int, nullable: false, min: 1, max: 360}
+      - {name: principal_due, type: float, nullable: false, min: 0}
+      - {name: principal_paid, type: float, nullable: false, min: 0}
+      - {name: interest_due, type: float, nullable: false, min: 0}
+      - {name: interest_paid, type: float, nullable: false, min: 0}
+      - {name: updated_at, type: str, nullable: false}
+
+  - name: provision
+    source: dwd.provision
+    target: dm.provision
+    business_key: [org_code, stat_date]
+    watermark: updated_at
+    columns:
+      - {name: org_code, type: str, nullable: false, enum: [SH01, SH02, SZ01]}
+      - {name: stat_date, type: str, nullable: false}
+      - {name: provision_amount, type: float, nullable: false, min: 0}
+      - {name: updated_at, type: str, nullable: false}
+
+checks:
+  # 表间勾稽：DM 宽表按机构汇总的余额，必须与 DWD 明细逐笔加总完全一致
+  cross_table:
+    - name: 贷款余额勾稽
+      left: {table: loan_contract, column: loan_balance, agg: sum}
+      right: {table: dm_credit_wide, column: loan_balance, agg: sum}
+      tolerance_ratio: 0.0

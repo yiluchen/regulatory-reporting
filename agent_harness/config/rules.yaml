@@ -1,0 +1,39 @@
+# 风险规则表：处置由这里声明，代码只负责匹配与仲裁（取最严格）
+rules:
+  - id: R-READ-AUTO
+    action: "query_report_data"
+    effect: auto
+    risk: low
+    reason: 本机构只读查询
+    conditions: {cross_org: false}
+
+  - id: R-CROSS-OBSERVE
+    action: "query_report_data"
+    effect: observe
+    risk: medium
+    reason: 跨机构查询需放行观察
+    conditions: {cross_org: true}
+
+  - id: R-REG-AUTO
+    action: "search_regulation"
+    effect: auto
+    risk: low
+    reason: 公开制度检索
+
+  - id: R-SUBMIT-ESCALATE
+    action: "submit_report"
+    effect: escalate
+    risk: high
+    reason: 报送提交必须人工复核
+
+  - id: R-DELETE-BLOCK
+    action: "delete_*"
+    effect: block
+    risk: high
+    reason: 删除类操作一律拦截
+
+  - id: R-EXPORT-OBSERVE
+    action: "export_*"
+    effect: observe
+    risk: medium
+    reason: 数据导出需留痕观察

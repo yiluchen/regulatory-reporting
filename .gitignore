@@ -1,0 +1,26 @@
+# Python 缓存与虚拟环境
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.env
+
+# 构建与覆盖率产物
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+
+# 运行产物与本地数据（不忽略源码与示例数据）
+*.db
+*.log
+*.jsonl.tmp
+data/artifacts/
+data/raw/
+output/
+
+# 系统文件
+.DS_Store
